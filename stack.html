@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Stack</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap.min.css">
+  <link href="plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="styles/main_styles.css">
+  <link rel="stylesheet" type="text/css" href="styles/animation.css">
+  <style>
+  body {
+    background-color: #39474F;
+  }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container-fluid">
+
+    <!-- Header -->
+
+    <div class="row"><header class="header d-flex flex-row justify-content-end align-items-center trans_200">
+
+      <!-- Logo -->
+      <div class="logo mr-auto" >
+        <a href="#"> <span>Stack</span></a>
+        <div class="divider"></div>
+
+
+      </div>
+
+    </header></div>
+
+
+    <div class="row" style="height:400px;margin-top:140px;">
+      <div class="col-md-3">
+        <a href="#" style="background-color:#ff6b09;border:none;"class="nav-tabs-dropdown btn btn-block btn-primary"><b>Operations</b></a>
+        <ul id="nav-tabs-wrapper" class="nav nav-tabs nav-pills nav-stacked well">
+          <li class="active" id="addNode">Push</li>
+          <li id="pop">Pop</li>
+
+        </ul>
+      </div>
+      <div id="animationBox" class="col-md-8" >
+
+      </div>
+    </div>
+
+
+
+    
+
+  </div>
+
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/helper_functions.js"></script>
+  <script src="js/anime.min.js"></script>
+  <script>
+
+  $(document).ready(function(){
+
+    var stack = [];
+
+
+    function startup(){
+
+      //creating html code for a single null node
+      var nullList = createCircleNode();
+      //adding the node to the animation box
+      animationBox.html(nullList);
+      //Setting the null Node starting position and then animating to middle of box
+      $('.node').css({"position":"absolute","top":topPos,"left":leftPos,"display":"block"}).animate({
+        top:  ((height/2) - (nodeHeight))
+      });
+
+    }
+
+    //calling startup function
+    startup();
+
+    function animateList(search=null){
+
+      animationBox.html('');
+      var length = stack.length;
+      if(length == 0){
+        startup();
+        return;
+      }
+      var index = 0;
+      var startingX = leftPos-((((stack.length*2)-1)/2)*nodeWidth);
+      for(var i=0;i<length;i++){
+
+        var val = stack[i];
+        var totalLength = (length*2)-1;
+        //creating new node
+        var newNode = createCircleNode(index,val);
+
+        //appending new node to animation box
+        newNode = $(newNode).appendTo(animationBox);
+
+        //setting start location of new node
+        newNode.css({"position":"absolute","top":topPos,"left":leftPos,"display":"block"}).animate({
+          top:((height/2) - (nodeHeight))
+        },1000);
+
+
+
+        var target = '#node'+index;
+
+        var translateX = leftPos-startingX;
+
+        var duration = (totalLength-index-1)*1000;
+        anime({
+          targets: target,
+          translateX: {value:translateX,duration:duration},
+          loop : false,
+          autoplay: true,
+          delay: 1500,
+          complete: function(){
+            if(search != null){
+              var data = $(target).attr('data');
+              if(data == search){
+                $(target).css('border','3px solid green');
+              }
+            }
+          }
+        });
+        index++;
+        startingX+=nodeWidth;
+        if(i!=(length-1)){
+
+          var newArrow = arrowBox(index);
+
+          newArrow = $(newArrow).appendTo(animationBox);
+
+          newArrow.css({"position":"absolute","top":topPos,"left":leftPos,"display":"none"}).animate({
+            top:((height/2) - nodeHeight +7)
+          },1000);
+
+          target = '#node'+index;
+          translateX = leftPos-startingX;
+          duration = (totalLength-index-1)*1000;
+
+          anime({
+            targets: target,
+            translateX: {value:translateX,duration:duration},
+            loop : false,
+            autoplay: true,
+            delay: 1500,
+            complete: function(){
+              $('.arrowBox').fadeIn(1100);
+            }
+          });
+          index++;
+          startingX+=nodeWidth;
+        }
+
+      }
+    }
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+    //Add Node Function
+    $('#addNode').click(function(){
+
+      if(stack.length<=10){
+        //Taking input from user
+        var input = prompt("Please enter a value", 0);
+
+        //Validating Input
+        if (input == null) {
+          alert('Invalid Input. Node cannot be added');
+        }else if( !($.isNumeric(input)) ){
+          alert('Invalid Input. Node cannot be added');
+        }else{
+          //On Validate Success
+          //Insert value to link list
+          stack.push(input);
+          //Visualize the List
+          animateList();
+        }}
+        else{
+          alert("Limit Reached Elements in Datastructure")
+        }
+      });
+
+
+      //Delete Node Function
+      $('#deleteNode').click(function(){
+
+        //Taking input from user
+        var input = prompt("Please enter a value", 0);
+
+        //Validating Input
+        if (input == null) {
+          alert('Invalid Input. Node cannot be delete');
+        }else if( !($.isNumeric(input)) ){
+          alert('Invalid Input. Node cannot be deleted');
+        }else{
+          //On Validate Success
+          //Deleting value from link list
+          i=stack.totalLength;
+          value=stack[i-1];
+          stack = remove(stack , value);
+        
+          //Visualize the List
+          animateList();
+        }
+      });
+
+      //POP Node Function
+      $('#pop').click(function(){
+
+        //On Validate Success
+        //Deleting value from link list
+        i=stack.length;
+        value=stack[i-1];
+
+        stack = remove(stack , value);
+        animateList();
+
+
+
+
+      });
+
+
+      $('#traverseList').click(function(){
+        animateList();
+      })
+
+    });
+    </script>
+
+  </body>
+
+  </html>

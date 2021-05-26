@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Array</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="styles/bootstrap4/bootstrap.min.css">
+  <link href="plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="styles/main_styles.css">
+  <link rel="stylesheet" type="text/css" href="styles/animation.css">
+  <style>
+  body {
+    background-color: #39474F;
+  }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container-fluid">
+
+    <!-- Header -->
+
+    <div class="row"><header class="header d-flex flex-row justify-content-end align-items-center trans_200">
+
+      <!-- Logo -->
+      <div class="logo mr-auto" >
+        <a href="#"> <span>Array</span></a>
+        <div class="divider"></div>
+
+
+      </div>
+
+    </header></div>
+
+
+    <div class="row" style="height:400px;margin-top:140px;">
+      <div class="col-md-3">
+        <a href="#" style="background-color:#ff6b09;border:none;"class="nav-tabs-dropdown btn btn-block btn-primary"><b>Operations</b></a>
+        <ul id="nav-tabs-wrapper" class="nav nav-tabs nav-pills nav-stacked well">
+          <li class="active" id="addNode">Insert Element</li>
+          <li id="searchNode">Access Element</li>
+          <li id="traverseList">Print Array</li>
+        </ul>
+      </div>
+      <div id="animationBox" class="col-md-8" >
+
+      </div>
+    </div>
+
+
+
+    
+
+  </div>
+
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/helper_functions.js"></script>
+  <script src="js/anime.min.js"></script>
+  <script>
+
+  $(document).ready(function(){
+
+    var array = [];
+
+
+    function startup(){
+
+      //creating html code for a single null node
+      var nullList = createBoxNode();
+      //adding the node to the animation box
+      animationBox.html(nullList);
+      //Setting the null Node starting position and then animating to middle of box
+      $('.node').css({"position":"absolute","top":topPos,"left":leftPos,"display":"block"}).animate({
+        top:  ((height/2) - (nodeHeight))
+      });
+
+    }
+
+    //calling startup function
+    startup();
+
+    function animateList(search=null){
+
+      animationBox.html('');
+      var length = array.length;
+      if(length == 0){
+        startup();
+        return;
+      }
+      var index = 0;
+
+      var startingX = leftPos-((array.length/2)*nodeWidth);
+      for(var i=0;i<length;i++){
+
+        var val = array[i];
+        var totalLength = (length*2)-1;
+        //creating new node
+        var newNode = createBoxNode(index,val);
+
+        //appending new node to animation box
+        newNode = $(newNode).appendTo(animationBox);
+
+        //setting start location of new node
+        newNode.css({"position":"absolute","top":topPos,"left":leftPos,"display":"block"}).animate({
+          top:((height/2) - (nodeHeight))
+        },1000);
+
+
+
+        var target = '#node'+index;
+
+        var translateX = startingX-leftPos;
+
+        var duration = (totalLength-index-1)*1000;
+        anime({
+          targets: target,
+          translateX: {value:translateX,duration:duration},
+          loop : false,
+          autoplay: true,
+          delay: 1500,
+          complete: function(){
+            if(search != null){
+              var data = $(target).attr('data');
+              if(data == search){
+                $(target).css('border','3px solid green');
+              }
+            }
+          }
+        });
+        index++;
+        startingX+=40;
+      }
+    }
+
+    //Add Node Function
+    $('#addNode').click(function(){
+
+
+      if(array.length<=15){
+        //Taking input from user
+        var input = prompt("Please enter a value", 0);
+
+        //Validating Input
+        if (input == null) {
+          alert('Invalid Input. Node cannot be added');
+        }else if( !($.isNumeric(input)) ){
+          alert('Invalid Input. Node cannot be added');
+        }else{
+          //On Validate Success
+          array.push(input);
+          //Visualize the List
+          animateList();
+        }
+      }
+      else{
+        alert("You cannot add more than 15 Elements");
+      }
+
+
+    });
+
+
+    $('#searchNode').click(function(){
+
+      //Taking input from user
+      var input = prompt("Please enter an index to search", 0);
+
+      //Validating Input
+      if (input == null) {
+        alert('Invalid Input. Node cannot be displayed');
+      }else if( !($.isNumeric(input)) ){
+        alert('Invalid Input. Node cannot be deleted');
+      }else if( input >= array.length || input<0){
+        alert('Index Not Found');
+      }else{
+        animationBox.html('');
+        var value = array[input];
+        var newNode = createBoxNode(0,value);
+        newNode = $(newNode).appendTo(animationBox);
+        newNode.css({"position":"absolute","top":topPos,"left":leftPos,"display":"block"}).animate({
+          top:((height/2) - (nodeHeight))
+        },1000);
+      }
+    });
+
+
+    $('#traverseList').click(function(){
+      animateList();
+    })
+
+  });
+  </script>
+
+</body>
+
+</html>
